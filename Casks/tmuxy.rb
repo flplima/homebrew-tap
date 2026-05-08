@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.1"
-  sha256 "486d9ce1b21bf9b35c8ddc44a422306312be216e18c6406282257f4018121fd7"
+  version "0.0.2"
+  sha256 "950ac5eac4a885ca6fa0e53760204630d6a41f99a7aa82a8925e74b50ddf5f00"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -10,6 +10,18 @@ cask "tmuxy" do
   auto_updates false
 
   app "tmuxy.app"
+
+  # Strip Gatekeeper's quarantine attribute so macOS Sequoia's
+  # "Apple could not verify..." dialog doesn't block the first
+  # launch. Brew stopped doing this automatically in 2022; for
+  # an unsigned + un-notarized app there's no other way to ship
+  # a frictionless first launch without paying for the Apple
+  # Developer Program.
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{appdir}/tmuxy.app"],
+                   sudo: false
+  end
 
   zap trash: [
     "~/.config/tmuxy",
