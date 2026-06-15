@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.10-alpha.27"
-  sha256 "9e7a971dd1f85702f5ba3193ad3a6f81d649cad54fe8163244ce84be4129cabc"
+  version "0.0.10-alpha.28"
+  sha256 "4dce85812bf2b08bd48f86d27cfb737f579d648e11538e2e9e9e269a8c5d27e2"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -21,6 +21,33 @@ cask "tmuxy" do
     system_command "/usr/bin/xattr",
                    args: ["-dr", "com.apple.quarantine", "#{appdir}/tmuxy.app"],
                    sudo: false
+
+    # Record the app binary path and install a CLI wrapper at
+    # ~/.local/bin/tmuxy so `tmuxy pane list` etc. work immediately
+    # after install, without opening the GUI first.
+    exec_path = "#{appdir}/tmuxy.app/Contents/MacOS/tmuxy"
+    config_dir = Pathname.new(Dir.home)/".config/tmuxy"
+    config_dir.mkpath
+    (config_dir/"launcher").write "#{exec_path}\n"
+
+    bin_dir = Pathname.new(Dir.home)/".local/bin"
+    bin_dir.mkpath
+    wrapper = bin_dir/"tmuxy"
+    wrapper.write "#!/bin/sh\n" \
+      "set -eu\n" \
+      "LAUNCHER_FILE=\"${XDG_CONFIG_HOME:-$HOME/.config}/tmuxy/launcher\"\n" \
+      "if [ ! -f \"$LAUNCHER_FILE\" ]; then\n" \
+      "  echo 'tmuxy: no launcher recorded — open the app once first.' >&2\n" \
+      "  exit 1\n" \
+      "fi\n" \
+      "EXEC_PATH=\"$(cat \"$LAUNCHER_FILE\")\"\n" \
+      "if [ \"$#\" -gt 0 ]; then exec \"$EXEC_PATH\" \"$@\"; fi\n" \
+      "APP_PATH=\"${EXEC_PATH%%/Contents/MacOS/*}\"\n" \
+      "if [ \"$APP_PATH\" != \"$EXEC_PATH\" ] && [ -d \"$APP_PATH\" ]; then\n" \
+      "  exec /usr/bin/open \"$APP_PATH\"\n" \
+      "fi\n" \
+      "exec \"$EXEC_PATH\"\n"
+    wrapper.chmod 0o755
   end
 
   zap trash: [
