@@ -1,37 +1,34 @@
 class Tmuxy < Formula
   desc "Web-based tmux interface"
   homepage "https://github.com/flplima/tmuxy"
-  version "0.0.10-alpha.43"
+  version "0.0.10-alpha.44"
 
   depends_on :linux
   depends_on "tmux"
 
   on_arm do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_aarch64.AppImage"
-    sha256 "edee55f2923350cdb785349986b92bcb7914d47151736ad1837b6855a859b7b8"
+    sha256 "faadb678296190320e287d9970d0d16ac43b2e85963fb0578a9827323c33cfff"
   end
 
   on_intel do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_amd64.AppImage"
-    sha256 "e81e0992da756dbe857812dd15a765e54462980156adb8200b9885b17f0a45d9"
+    sha256 "d8c7e87a155b57830e6079ad14e64151ed80870585eb88cbf4557b48a373c54a"
   end
 
   def install
     bin.install Dir["tmuxy_*.AppImage"].first => "tmuxy"
   end
 
-  # Homebrew 6.0+ sandboxes post_install ($HOME is read-only),
-  # so .desktop/icon install runs outside brew via caveats.
+  # The applications-menu entry cannot be installed from here:
+  # Homebrew 6 sandboxes post_install with a read-only $HOME, and
+  # Homebrew's own share/applications is not on XDG_DATA_DIRS. The
+  # app registers itself on launch instead (see
+  # packages/tmuxy-tauri-app/src/desktop.rs).
   def caveats
     <<~EOS
-      To add tmuxy to your application menu, run once:
-        #{bin}/tmuxy --appimage-extract usr/share 2>/dev/null; \\
-        mkdir -p ~/.local/share/applications ~/.local/share/icons; \\
-        sed 's|Exec=.*|Exec=#{bin}/tmuxy gui|;s|Icon=.*|Icon=tmuxy|;s|StartupWMClass=.*|StartupWMClass=tmuxy|' \\
-          squashfs-root/usr/share/applications/tmuxy.desktop \\
-          > ~/.local/share/applications/tmuxy.desktop; \\
-        cp -r squashfs-root/usr/share/icons/hicolor ~/.local/share/icons/; \\
-        rm -rf squashfs-root
+      Run `tmuxy` once to add it to your applications menu.
+      Set TMUXY_NO_DESKTOP_ENTRY=1 to skip that.
     EOS
   end
 
