@@ -1,19 +1,19 @@
 class Tmuxy < Formula
   desc "Web-based tmux interface"
   homepage "https://github.com/flplima/tmuxy"
-  version "0.0.10-alpha.61"
+  version "0.0.10-alpha.62"
 
   depends_on :linux
   depends_on "tmux"
 
   on_arm do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_aarch64.AppImage"
-    sha256 "d5e381cc6f48adc3a6ce772e0dfe4e853008690403bfcc9ae4839f20bbbaab3f"
+    sha256 "ea6e0f6e9585413a5c2f2c1ae3ac1d3ffac949d0422508d19d0205c834b32961"
   end
 
   on_intel do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_amd64.AppImage"
-    sha256 "802f5ec2f187a5fd17cf5ae274e1f0b81d479925150e1897b524cf7e8a2b8f2c"
+    sha256 "6c03ec0d7aefc5e04f4becf6fd84ec39bf8f20156b15ca97996725bd43af04af"
   end
 
   def install
@@ -32,7 +32,34 @@ class Tmuxy < Formula
     EOS
   end
 
+  # `assert_path_exists` only proved a file landed — it would pass on
+  # a truncated download, an AppImage for the wrong arch, or a build
+  # that cannot start. This runs the thing: version out of the binary
+  # that was installed, then the server serving its page on a free
+  # port. APPIMAGE_EXTRACT_AND_RUN because `brew test` has no FUSE.
   test do
     assert_path_exists bin/"tmuxy"
+
+    ENV["APPIMAGE_EXTRACT_AND_RUN"] = "1"
+    assert_match "tmuxy #{version}", shell_output("#{bin}/tmuxy --version")
+
+    port = free_port
+    # `spawn` wants Strings; `bin/"tmuxy"` is a Pathname.
+    pid = spawn((bin/"tmuxy").to_s, "server", "--port", port.to_s)
+    begin
+      page = nil
+      20.times do
+        sleep 1
+        # `|| true` so a connection refused while the server is still
+        # binding is a retry, not an exception. The assert below is
+        # what decides the test.
+        page = shell_output("curl -fsS http://127.0.0.1:#{port}/ || true")
+        break if page.include?("<html")
+      end
+      assert_match "<html", page.to_s
+    ensure
+      Process.kill "TERM", pid
+      Process.wait pid
+    end
   end
 end
