@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.10-alpha.66"
-  sha256 "eefb0e4ed744d62f7eb19e142c2ed136e77188eef49b241c12fe44eaf55f37e2"
+  version "0.0.10-alpha.67"
+  sha256 "7b095e9f881e5c3611d9dbffb711cc392b5a824f5cc43b57a28f039cbcbf9471"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -21,8 +21,9 @@ cask "tmuxy" do
   # the user with the app and no `tmuxy` command.
   postflight do
     # Homebrew marks the downloaded app with Gatekeeper's quarantine
-    # attribute, which puts a confirmation dialog in front of the
-    # first launch. Removing it keeps that launch frictionless.
+    # attribute, which puts a one-time "downloaded from the Internet"
+    # prompt in front of the first launch even for a notarized app.
+    # Removing it keeps that launch frictionless.
     system_command "/usr/bin/xattr",
                    args:         ["-dr", "com.apple.quarantine", "#{appdir}/tmuxy.app"],
                    must_succeed: false
