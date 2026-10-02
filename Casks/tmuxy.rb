@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.10-alpha.67"
-  sha256 "7b095e9f881e5c3611d9dbffb711cc392b5a824f5cc43b57a28f039cbcbf9471"
+  version "0.0.10-alpha.68"
+  sha256 "3ad11682dcd9b7bee4229969a5fe3470d753a3670d5039542867ed653b324ccc"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
