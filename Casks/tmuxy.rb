@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.10-alpha.68"
-  sha256 "3ad11682dcd9b7bee4229969a5fe3470d753a3670d5039542867ed653b324ccc"
+  version "0.0.10-alpha.70"
+  sha256 "ca24ab3ed7a6d85f6663eb0ff36731b11b8dfa1f7cba5e0fed4dfd696f58776a"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -62,6 +62,6 @@ cask "tmuxy" do
     "~/Library/Application Support/com.tmuxy.app",
     "~/Library/Preferences/com.tmuxy.app.plist",
     "~/Library/Saved Application State/com.tmuxy.app.savedState",
-    "~/tmuxy-debug.log",
+    "~/Library/Application Support/tmuxy",
   ]
 end
