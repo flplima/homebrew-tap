@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.0.10-alpha.77"
-  sha256 "48e7c15ba4137c696e5a1184da700462b9e6b4ee06432416f992088ec6bf7167"
+  version "0.0.10-alpha.78"
+  sha256 "79f8f843c982cec4363d6730fc5b25a1087354b48fa739cf2b5c7f474e7a7af5"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -8,36 +8,35 @@ cask "tmuxy" do
   homepage "https://github.com/flplima/tmuxy"
 
   auto_updates false
-
   depends_on formula: "tmux"
+  depends_on :macos
 
   app "tmuxy.app"
 
-  # `postflight` is the stanza Homebrew runs after the app is
-  # installed, and it is plain Ruby. A cask body silently ignores a
-  # stanza it does not know — v0.0.10-alpha.63 shipped a
-  # `postflight_steps do` block that parsed, installed, audited and
-  # styled cleanly while doing nothing at all, so a brew install left
-  # the user with the app and no `tmuxy` command.
-  postflight do
+  # `postflight_steps` is a declarative list Homebrew runs, sandboxed,
+  # after the app is installed; Homebrew 7 deprecated the plain-Ruby
+  # `postflight` block in its favour. Steps name their paths so the
+  # sandbox knows what to let them write: `{{appdir}}` is expanded
+  # by Homebrew, and `base: :home` roots a path at the user's home.
+  # The release workflow's verify-brew-cask job checks the wrapper
+  # actually lands: on a Homebrew that predated `postflight_steps`
+  # (alpha.63) the block parsed cleanly and did nothing.
+  postflight_steps do
     # Homebrew marks the downloaded app with Gatekeeper's quarantine
     # attribute, which puts a one-time "downloaded from the Internet"
     # prompt in front of the first launch even for a notarized app.
     # Removing it keeps that launch frictionless.
-    system_command "/usr/bin/xattr",
-                   args:         ["-dr", "com.apple.quarantine", "#{appdir}/tmuxy.app"],
-                   must_succeed: false
+    run "/usr/bin/xattr",
+        args:         ["-dr", "com.apple.quarantine", "{{appdir}}/tmuxy.app"],
+        must_succeed: false
 
     # Record the app binary path and install a CLI wrapper at
     # ~/.local/bin/tmuxy so `tmuxy pane list` etc. work immediately
     # after install, without opening the GUI first.
-    launcher = File.expand_path("~/.config/tmuxy/launcher")
-    FileUtils.mkdir_p File.dirname(launcher)
-    File.write launcher, "#{appdir}/tmuxy.app/Contents/MacOS/tmuxy\n"
-
-    wrapper = File.expand_path("~/.local/bin/tmuxy")
-    FileUtils.mkdir_p File.dirname(wrapper)
-    File.write wrapper, <<~'WRAPPER'
+    mkdir_p ".config/tmuxy", base: :home
+    mkdir_p ".local/bin", base: :home
+    write_file ".config/tmuxy/launcher", "{{appdir}}/tmuxy.app/Contents/MacOS/tmuxy\n", base: :home
+    write_file ".local/bin/tmuxy", <<~WRAPPER, base: :home
       #!/bin/sh
       set -eu
       LAUNCHER_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/tmuxy/launcher"
@@ -53,15 +52,15 @@ cask "tmuxy" do
       fi
       exec "$EXEC_PATH"
     WRAPPER
-    FileUtils.chmod 0o755, wrapper
+    set_permissions ".local/bin/tmuxy", "0755", base: :home, recursive: false
   end
 
   zap trash: [
     "~/.config/tmuxy",
     "~/.local/bin/tmuxy",
     "~/Library/Application Support/com.tmuxy.app",
+    "~/Library/Application Support/tmuxy",
     "~/Library/Preferences/com.tmuxy.app.plist",
     "~/Library/Saved Application State/com.tmuxy.app.savedState",
-    "~/Library/Application Support/tmuxy",
   ]
 end
