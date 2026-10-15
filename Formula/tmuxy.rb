@@ -1,19 +1,19 @@
 class Tmuxy < Formula
   desc "Web-based tmux interface"
   homepage "https://github.com/flplima/tmuxy"
-  version "0.0.10-alpha.77"
+  version "0.0.10-alpha.78"
 
   depends_on :linux
   depends_on "tmux"
 
   on_arm do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_aarch64.AppImage"
-    sha256 "6d437c275253ce49ce754fe75ecfd512d0336b818b6b532b509a1f968700117c"
+    sha256 "d3db7e0df8d427c9a3fd0a3e5a5cf52a73ce27ce3ed14c7a5cbb24b8461b9062"
   end
 
   on_intel do
     url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_amd64.AppImage"
-    sha256 "0ab90732e62f2c7a6a6a392d27893ec2e437166a226e617e448d2f36ef7455d4"
+    sha256 "bef3d77dc75397e2c6b92b96c41ff2f2b06fd67dad56eff2e3280b5e6931232b"
   end
 
   def install
