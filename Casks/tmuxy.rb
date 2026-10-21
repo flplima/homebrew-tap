@@ -1,18 +1,17 @@
 cask "tmuxy" do
-  version "0.1.0"
-  sha256 "da238859fed8a7ac53c3c1b5224433fa0803149aac100f900489cdd0674f7dca"
+  version "0.1.1"
+  sha256 "3d5bb1edbc02efb77a0367a96f5fbb09cf3e68cd20fa2af06f31e211f7df2ef4"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
-  desc "Web-based tmux interface"
-  homepage "https://github.com/flplima/tmuxy"
+  desc "Desktop UI for tmux"
+  homepage "https://tmuxy.sh/"
 
   livecheck do
     url :url
     strategy :github_latest
   end
 
-  auto_updates false
   depends_on formula: "tmux"
   depends_on :macos
 
@@ -24,7 +23,7 @@ cask "tmuxy" do
     "~/.local/bin/tmuxy",
     "~/Library/Application Support/com.tmuxy.app",
     "~/Library/Application Support/tmuxy",
-    "~/Library/Preferences/com.tmuxy.app.plist",
-    "~/Library/Saved Application State/com.tmuxy.app.savedState",
+    "~/Library/Caches/com.tmuxy.app",
+    "~/Library/WebKit/com.tmuxy.app",
   ]
 end
