@@ -1,6 +1,6 @@
 cask "tmuxy" do
-  version "0.1.4"
-  sha256 "52a2c721a0f4b2b2cb1e34aeb5373a32f5c586b062b01723ea97a41773201d49"
+  version "0.1.6"
+  sha256 "e2268aa09934e2b61fda7ac5847e8e5fd85623ce2abdc983165b14fac7cbcf9f"
 
   url "https://github.com/flplima/tmuxy/releases/download/v#{version}/tmuxy_#{version}_universal.dmg"
   name "tmuxy"
@@ -20,6 +20,7 @@ cask "tmuxy" do
 
   zap trash: [
     "~/.config/tmuxy",
+    "~/.local/share/tmuxy",
     "~/.local/bin/tmuxy",
     "~/Library/Application Support/com.tmuxy.app",
     "~/Library/Application Support/tmuxy",
